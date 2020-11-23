@@ -5,7 +5,6 @@ Created on Tue Nov 17 20:45:39 2020
 @author: Jenni
 """
 
-
 #Usando os dados de ofertas de vinho no mercado de atacado, defina profiles de
 #compras baseando-se nas transações.
 #Use o algoritmo K-Means para seguimento os clientes baseado nas
@@ -15,37 +14,39 @@ import os
 os.chdir("D:\Jenni\Documents\Data Science\Dados")
 
 import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
-import numpy as np
-import csv
+import csv 
 
-transaction = pd.read_csv('./Transactions2.csv')
-information = pd.read_csv('./OfferInformation.csv')
+transaction = pd.read_csv('./Transactions2.csv', delimiter=';')
 
-#age, spending core
-#criar uma nova tabela de information para pessoa e ofertas, com 0 e 1.
+lista = [list(row) for row in transaction.values]
+# Print list of lists i.e. rows
+print(lista)
+def findItem(theList, item):
+   return [(ind, theList[ind].index(item)) for ind in range(len(theList)) if item in theList[ind]]
 
-print(transaction)
-
-#Criar um csv de 32 colunas (ofertas) pela quantidade de pessoas não repetidas
-#ofertas
-import csv
-pessoas = []
-'''with open('TransactionsByPerson.csv', 'w', newline='') as file:
-    writer = csv.writer(file)
-    writer.writerow(["Pessoa", "1", "2", "3", "4", "5", "6", "7", "8", "9",
-    "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21",
-    "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32"])
-    #writer.writerow([1, "Linus Torvalds", "Linux Kernel"])'''
+transacoes = [] 
+for i, j in lista:
+    #if current rows 2nd value is equal to input, print that row
+   pessoa = i
+   oferta = j
+   transacao = [0] * 33
+   if pessoa in (item for sublist in transacoes for item in sublist):
+       ind = (findItem(transacoes, pessoa)) # [(0, 0)]
+       ind = ind[0][0]
+       transacoes[ind].insert(oferta, "1")
+   else:
+       transacao.insert(0, pessoa)
+       transacao.insert(oferta, "1")
+       transacoes.append(transacao) 
+   
+print(transacoes)
+header = ['Pessoa', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+    '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21',
+    '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32']
     
-for i in range(len(transaction)):
-    pessoa = transaction.values[i][0]
-    #x = ['p','y','t','h','o','n']
-    #print(x.index('o'))
-    #acha o index da pessoa tal e coloca em [index][offer]
-    p = pessoa.split(";")[0]
-    if not p in pessoas:
-        pessoas.append(p)
-    offer = pessoa.split(";")[-1]
-    #np.insert()
-print(pessoas)
+with open('TransactionsByPerson.csv', 'w',  newline='', encoding='utf-8') as f: 
+    # using csv.writer method from CSV package 
+    write = csv.writer(f) 
+    write.writerow(header) 
+    write.writerows(transacoes) 
     
